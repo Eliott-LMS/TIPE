@@ -3,6 +3,9 @@
 
 #include <SDL2/SDL2_gfxPrimitives.h>
 
+#include <SDL2/SDL_surface.h>
+#include <SDL2/SDL_image.h> // Utile si tu veux exporter en PNG plus tard
+
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -829,6 +832,25 @@ void capture_frame(SDL_Renderer* renderer, int frame_number) {
     SDL_FreeSurface(surface);
 }
 
+void save_frame(SDL_Renderer* renderer, int frame_number) {
+    char filename[64];
+    snprintf(filename, sizeof(filename), "frames/frame_%04d.bmp", frame_number);
+
+    SDL_Surface* screen_surface = SDL_CreateRGBSurfaceWithFormat(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
+    if (!screen_surface) {
+        fprintf(stderr, "Erreur création surface: %s\n", SDL_GetError());
+        return;
+    }
+
+    if (SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_RGBA32, screen_surface->pixels, screen_surface->pitch) != 0) {
+        fprintf(stderr, "Erreur lecture pixels: %s\n", SDL_GetError());
+        SDL_FreeSurface(screen_surface);
+        return;
+    }
+
+    SDL_SaveBMP(screen_surface, filename);
+    SDL_FreeSurface(screen_surface);
+}
 
 
 int main(int argc, char *argv[]) {
