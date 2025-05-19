@@ -1,10 +1,6 @@
-# TIPE
 #include <SDL2/SDL.h>
 
 #include <SDL2/SDL2_gfxPrimitives.h>
-
-#include <SDL2/SDL_surface.h>
-#include <SDL2/SDL_image.h> // Utile si tu veux exporter en PNG plus tard
 
 #include <stdio.h>
 
@@ -143,11 +139,6 @@ typedef struct Grid {
 } Grid;
 
 //---------------------------------------------------------------------------------------
-void appliquer_resistance(Ball *b) {
-    const double k = 0.3; // Coefficient de frottement de l'air
-    b->ax -= k * b->vx;
-    b->ay -= k * b->vy;
-}
 
 double random_double_range(double min, double max) {
 
@@ -272,7 +263,7 @@ void collission_balle(Ball *b1, Ball *b2) {
 void move (Ball liste_balles[], int nb_balles) {
 
     for (int i = 0; i < nb_balles; i++) {
-        appliquer_resistance(&liste_balles[i])
+
         liste_balles[i].vy += liste_balles[i].ay * DT;
 
         liste_balles[i].y += liste_balles[i].vy * DT;
@@ -823,34 +814,8 @@ void draw_cluster_outline(SDL_Renderer* renderer, Ball *balls, int *clusters, in
 
 void draw_cluster_outline(SDL_Renderer* renderer, Ball *balls, int *clusters, int nb_balls, int cluster_id, double rapportx, double rapporty);
 
-void capture_frame(SDL_Renderer* renderer, int frame_number) {
-    char filename[100];
-    snprintf(filename, sizeof(filename), "frames/frame_%04d.bmp", frame_number);
-    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
-    SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_RGBA32, surface->pixels, surface->pitch);
-    SDL_SaveBMP(surface, filename);
-    SDL_FreeSurface(surface);
-}
 
-void save_frame(SDL_Renderer* renderer, int frame_number) {
-    char filename[64];
-    snprintf(filename, sizeof(filename), "frames/frame_%04d.bmp", frame_number);
 
-    SDL_Surface* screen_surface = SDL_CreateRGBSurfaceWithFormat(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
-    if (!screen_surface) {
-        fprintf(stderr, "Erreur création surface: %s\n", SDL_GetError());
-        return;
-    }
-
-    if (SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_RGBA32, screen_surface->pixels, screen_surface->pitch) != 0) {
-        fprintf(stderr, "Erreur lecture pixels: %s\n", SDL_GetError());
-        SDL_FreeSurface(screen_surface);
-        return;
-    }
-
-    SDL_SaveBMP(screen_surface, filename);
-    SDL_FreeSurface(screen_surface);
-}
 
 
 int main(int argc, char *argv[]) {
@@ -1014,8 +979,7 @@ int main(int argc, char *argv[]) {
             // Mettre à jour l'écran
 
             SDL_RenderPresent(renderer);
-            static int frame_count = 0;
-            capture_frame(renderer, frame_count++);
+
 
 
             SDL_Delay(DT*1000/100); // Convertir DT en millisecondes
@@ -1045,3 +1009,4 @@ int main(int argc, char *argv[]) {
     return 0;
 
 }
+
